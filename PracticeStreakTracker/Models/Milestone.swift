@@ -18,7 +18,7 @@ struct Milestone: Identifiable {
         Milestone(days: 30, title: "Monthly Master", description: "A full month of practice. Incredible commitment!", symbolName: "crown.fill"),
         Milestone(days: 60, title: "Two Month Champion", description: "60 days of consistent effort. You're unstoppable.", symbolName: "trophy.fill"),
         Milestone(days: 90, title: "Quarter Year Hero", description: "90 days! Your dedication is truly inspiring.", symbolName: "medal.fill"),
-        Milestone(days: 100, title: "Century Club", description: "100 days of practice. A remarkable achievement!", symbolName: "100.circle.fill"),
+        Milestone(days: 100, title: "Century Club", description: "100 days of practice. A remarkable achievement!", symbolName: "checkmark.seal.fill"),
         Milestone(days: 180, title: "Half Year Legend", description: "6 months of daily practice. You're transforming your speech.", symbolName: "sparkles"),
         Milestone(days: 365, title: "One Year Milestone", description: "365 days! A full year of commitment to your growth.", symbolName: "star.circle.fill")
     ]
