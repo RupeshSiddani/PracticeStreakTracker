@@ -7,9 +7,15 @@ struct PracticeStreakTrackerApp: App {
     
     var body: some Scene {
         WindowGroup {
-            MainTabView()
-                .environmentObject(viewModel)
-                .preferredColorScheme(nil) // Supports both light and dark mode
+            Group {
+                if viewModel.isOnboardingComplete {
+                    MainTabView()
+                } else {
+                    OnboardingView()
+                }
+            }
+            .environmentObject(viewModel)
+            .animation(.easeInOut(duration: 0.4), value: viewModel.isOnboardingComplete)
         }
     }
 }

@@ -28,6 +28,8 @@ final class StreakViewModel: ObservableObject {
     @Published var showPracticeSession: Bool = false
     @Published var practiceProgress: Double = 0.0
     
+    @Published var userProfile: UserProfile = .default
+    
     // MARK: - Private Properties
     
     private let persistence = PersistenceService.shared
@@ -53,6 +55,7 @@ final class StreakViewModel: ObservableObject {
         self.notificationsEnabled = userData.notificationsEnabled
         self.notificationHour = userData.preferredNotificationHour
         self.notificationMinute = userData.preferredNotificationMinute
+        self.userProfile = userData.userProfile
         
         recalculateStreaks()
         checkTodayStatus()
@@ -132,6 +135,43 @@ final class StreakViewModel: ObservableObject {
         currentMilestone = nil
     }
     
+    // MARK: - Onboarding
+    
+    /// Saves the user profile after onboarding completes
+    func completeOnboarding(profile: UserProfile) {
+        userProfile = profile
+        save()
+        haptics.success()
+    }
+    
+    /// Whether onboarding has been completed
+    var isOnboardingComplete: Bool {
+        userProfile.onboardingCompleted
+    }
+    
+    /// Returns personalized exercises based on user's selected sounds.
+    /// Picks exercises from the first selected sound for each session,
+    /// rotating through sounds across sessions.
+    var personalizedExercises: [ExerciseStep] {
+        let sounds = userProfile.selectedSounds
+        guard !sounds.isEmpty else {
+            return SpeechSound.r.exercises
+        }
+        // Rotate through sounds based on total practice days
+        let dayIndex = records.filter { $0.type == .practiced }.count
+        let sound = sounds[dayIndex % sounds.count]
+        return sound.exercises
+    }
+    
+    /// Returns the current practice sound name
+    var currentPracticeSoundName: String {
+        let sounds = userProfile.selectedSounds
+        guard !sounds.isEmpty else { return "R" }
+        let dayIndex = records.filter { $0.type == .practiced }.count
+        let sound = sounds[dayIndex % sounds.count]
+        return sound.displayName
+    }
+    
     // MARK: - Data Management
     
     /// Resets all user data
@@ -146,6 +186,7 @@ final class StreakViewModel: ObservableObject {
         hasPracticedToday = false
         isFrozenToday = false
         notificationsEnabled = false
+        userProfile = .default
         notifications.cancelDailyReminder()
         
         haptics.warning()
@@ -345,6 +386,7 @@ final class StreakViewModel: ObservableObject {
         userData.notificationsEnabled = notificationsEnabled
         userData.preferredNotificationHour = notificationHour
         userData.preferredNotificationMinute = notificationMinute
+        userData.userProfile = userProfile
         
         do {
             try persistence.save(userData)

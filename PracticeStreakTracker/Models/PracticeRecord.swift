@@ -48,6 +48,7 @@ struct UserData: Codable {
     var notificationsEnabled: Bool
     var preferredNotificationHour: Int
     var preferredNotificationMinute: Int
+    var userProfile: UserProfile
     
     static let `default` = UserData(
         records: [],
@@ -55,6 +56,7 @@ struct UserData: Codable {
         celebratedMilestones: [],
         notificationsEnabled: false,
         preferredNotificationHour: 20,  // 8 PM default
-        preferredNotificationMinute: 0
+        preferredNotificationMinute: 0,
+        userProfile: .default
     )
 }

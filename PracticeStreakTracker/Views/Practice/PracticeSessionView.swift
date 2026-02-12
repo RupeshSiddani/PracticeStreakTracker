@@ -18,17 +18,10 @@ struct PracticeSessionView: View {
     
     private let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
     
-    /// Mock exercise steps simulating a real speech therapy session.
-    /// Durations are intentionally long — users with rhotacism need
-    /// time to position their tongue, attempt the sound, and retry.
-    private let exercises = [
-        ExerciseStep(title: "Warm Up", instruction: "Take 3 slow, deep breaths.\nRelax your jaw, tongue, and lips between each breath.", icon: "wind", durationSeconds: 15),
-        ExerciseStep(title: "Tongue Placement", instruction: "Curl the tip of your tongue slightly back without touching the roof of your mouth. Hold and breathe gently.", icon: "mouth.fill", durationSeconds: 20),
-        ExerciseStep(title: "R Sound Practice", instruction: "Slowly say \"rrr\" — hold the sound as long as you can.\nPause, relax, and try again 3 times.", icon: "waveform", durationSeconds: 25),
-        ExerciseStep(title: "Word Practice", instruction: "Say each word slowly with a pause between:\nRiver… Rain… Road… Right…\nRepeat the list twice.", icon: "character.bubble", durationSeconds: 25),
-        ExerciseStep(title: "Sentence Practice", instruction: "Read slowly:\n\"The rabbit ran around the red rock.\"\nTake your time. Repeat 2-3 times.", icon: "quote.bubble.fill", durationSeconds: 25),
-        ExerciseStep(title: "Cool Down", instruction: "Wonderful work today!\nTake 3 final deep breaths and relax your mouth.", icon: "sparkles", durationSeconds: 15)
-    ]
+    /// Personalized exercises loaded from the ViewModel based on user's speech sound selection
+    private var exercises: [ExerciseStep] {
+        viewModel.personalizedExercises
+    }
     
     var body: some View {
         NavigationView {
@@ -40,7 +33,7 @@ struct PracticeSessionView: View {
                 }
             }
             .background(Color.tsGroupedBackground.ignoresSafeArea())
-            .navigationTitle("Practice Session")
+            .navigationTitle("\(viewModel.currentPracticeSoundName) Sound Practice")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

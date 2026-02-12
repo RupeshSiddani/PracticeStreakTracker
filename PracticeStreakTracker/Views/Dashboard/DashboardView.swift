@@ -33,7 +33,7 @@ struct DashboardView: View {
                 .padding(.bottom, 24)
             }
             .background(Color.tsGroupedBackground.ignoresSafeArea())
-            .navigationTitle("Practice Streak")
+            .navigationTitle("Hi, \(viewModel.userProfile.name.isEmpty ? "there" : viewModel.userProfile.name)!")
             .sheet(isPresented: $showPracticeSession) {
                 PracticeSessionView()
             }
@@ -153,8 +153,15 @@ struct DashboardView: View {
                 Image(systemName: viewModel.hasPracticedToday ? "checkmark.circle.fill" : "play.circle.fill")
                     .font(.title2)
                 
-                Text(viewModel.hasPracticedToday ? "Practice Complete!" : "Start Practice")
-                    .font(.headline)
+                VStack(spacing: 2) {
+                    Text(viewModel.hasPracticedToday ? "Practice Complete!" : "Start Practice")
+                        .font(.headline)
+                    if !viewModel.hasPracticedToday {
+                        Text("Today: \(viewModel.currentPracticeSoundName) Sound")
+                            .font(.caption)
+                            .opacity(0.85)
+                    }
+                }
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
