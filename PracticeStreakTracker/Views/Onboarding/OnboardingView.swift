@@ -9,7 +9,7 @@ struct OnboardingView: View {
     @State private var currentPage = 0
     @State private var name = ""
     @State private var selectedAge: AgeGroup = .adult
-    @State private var selectedSounds: Set<SpeechSound> = []
+    @State private var selectedSounds: Set<SpeechSound> = [.r]
     @State private var animateContent = false
     
     var body: some View {
@@ -75,7 +75,7 @@ struct OnboardingView: View {
                 .multilineTextAlignment(.center)
                 .foregroundColor(.primary)
             
-            Text("Your personal speech therapy companion.\nLet's set things up so we can tailor\nexercises just for you.")
+            Text("Your R-sound speech therapy companion.\nDesigned to help you master the R sound\nthrough daily guided practice.")
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
@@ -206,7 +206,7 @@ struct OnboardingView: View {
                 .foregroundColor(.primary)
                 .multilineTextAlignment(.center)
             
-            Text("Select all that apply. We'll create\ncustom exercises for each one.")
+            Text("R is pre-selected as your primary focus.\nSelect any additional sounds you'd like to practice.")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)

@@ -4,7 +4,7 @@ import Foundation
 /// Represents specific speech sounds that a user may struggle with.
 /// Each case contains tailored exercise content for that sound.
 enum SpeechSound: String, Codable, CaseIterable, Identifiable {
-    case r = "R"
+    case r = "R"          // Primary focus — Rhotacism
     case s = "S"
     case l = "L"
     case th = "TH"
