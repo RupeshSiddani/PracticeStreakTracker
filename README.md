@@ -74,4 +74,4 @@ MVVM (Model-View-ViewModel)
 
 ## Author
 
-Built as part of the TopSpeech Health Engineering Internship Assessment.
+Built by **Rupesh Siddani** as part of the TopSpeech Health Engineering Internship Assessment.
