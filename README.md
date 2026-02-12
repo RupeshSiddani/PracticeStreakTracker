@@ -61,7 +61,7 @@ MVVM (Model-View-ViewModel)
 2. Set Product Name to `PracticeStreakTracker`, Interface: SwiftUI, Language: Swift
 3. Delete the default `ContentView.swift`
 4. Drag all files from the `PracticeStreakTracker/` source folder into the Xcode project
-5. Set deployment target to iOS 15.0
+5. Set deployment target to iOS 15.0+
 6. Build and run
 
 ## Design Decisions
