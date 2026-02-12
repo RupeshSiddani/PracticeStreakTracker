@@ -29,6 +29,7 @@ final class StreakViewModel: ObservableObject {
     @Published var practiceProgress: Double = 0.0
     
     @Published var userProfile: UserProfile = .default
+    @Published var isDarkMode: Bool = false
     
     // MARK: - Private Properties
     
@@ -56,6 +57,7 @@ final class StreakViewModel: ObservableObject {
         self.notificationHour = userData.preferredNotificationHour
         self.notificationMinute = userData.preferredNotificationMinute
         self.userProfile = userData.userProfile
+        self.isDarkMode = userData.isDarkMode
         
         recalculateStreaks()
         checkTodayStatus()
@@ -133,6 +135,14 @@ final class StreakViewModel: ObservableObject {
     func dismissMilestone() {
         showMilestoneCelebration = false
         currentMilestone = nil
+    }
+    
+    // MARK: - Appearance
+    
+    /// Toggles dark mode on/off and persists the setting
+    func toggleDarkMode() {
+        isDarkMode.toggle()
+        save()
     }
     
     // MARK: - Onboarding
@@ -387,6 +397,7 @@ final class StreakViewModel: ObservableObject {
         userData.preferredNotificationHour = notificationHour
         userData.preferredNotificationMinute = notificationMinute
         userData.userProfile = userProfile
+        userData.isDarkMode = isDarkMode
         
         do {
             try persistence.save(userData)

@@ -11,6 +11,9 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             Form {
+                // Appearance Section
+                appearanceSection
+                
                 // Notifications Section
                 notificationsSection
                 
@@ -30,6 +33,33 @@ struct SettingsView: View {
                     reminderTime = date
                 }
             }
+        }
+    }
+    
+    // MARK: - Appearance Section
+    private var appearanceSection: some View {
+        Section {
+            HStack {
+                Label {
+                    Text("Dark Mode")
+                } icon: {
+                    Image(systemName: viewModel.isDarkMode ? "moon.fill" : "sun.max.fill")
+                        .foregroundColor(viewModel.isDarkMode ? .celebrationPurple : .streakGold)
+                }
+                
+                Spacer()
+                
+                Toggle("", isOn: Binding(
+                    get: { viewModel.isDarkMode },
+                    set: { _ in viewModel.toggleDarkMode() }
+                ))
+                .tint(Color.tsSecondaryFallback)
+            }
+            .accessibilityLabel("Dark Mode \(viewModel.isDarkMode ? "enabled" : "disabled")")
+        } header: {
+            Text("Appearance")
+        } footer: {
+            Text("Switch between light and dark theme for the app.")
         }
     }
     

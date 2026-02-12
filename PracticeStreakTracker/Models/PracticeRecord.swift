@@ -49,6 +49,30 @@ struct UserData: Codable {
     var preferredNotificationHour: Int
     var preferredNotificationMinute: Int
     var userProfile: UserProfile
+    var isDarkMode: Bool
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        records = try container.decode([PracticeRecord].self, forKey: .records)
+        freezesAvailable = try container.decode(Int.self, forKey: .freezesAvailable)
+        celebratedMilestones = try container.decode([Int].self, forKey: .celebratedMilestones)
+        notificationsEnabled = try container.decode(Bool.self, forKey: .notificationsEnabled)
+        preferredNotificationHour = try container.decode(Int.self, forKey: .preferredNotificationHour)
+        preferredNotificationMinute = try container.decode(Int.self, forKey: .preferredNotificationMinute)
+        userProfile = try container.decodeIfPresent(UserProfile.self, forKey: .userProfile) ?? .default
+        isDarkMode = try container.decodeIfPresent(Bool.self, forKey: .isDarkMode) ?? false
+    }
+    
+    init(records: [PracticeRecord], freezesAvailable: Int, celebratedMilestones: [Int], notificationsEnabled: Bool, preferredNotificationHour: Int, preferredNotificationMinute: Int, userProfile: UserProfile, isDarkMode: Bool) {
+        self.records = records
+        self.freezesAvailable = freezesAvailable
+        self.celebratedMilestones = celebratedMilestones
+        self.notificationsEnabled = notificationsEnabled
+        self.preferredNotificationHour = preferredNotificationHour
+        self.preferredNotificationMinute = preferredNotificationMinute
+        self.userProfile = userProfile
+        self.isDarkMode = isDarkMode
+    }
     
     static let `default` = UserData(
         records: [],
@@ -57,6 +81,7 @@ struct UserData: Codable {
         notificationsEnabled: false,
         preferredNotificationHour: 20,  // 8 PM default
         preferredNotificationMinute: 0,
-        userProfile: .default
+        userProfile: .default,
+        isDarkMode: false
     )
 }
