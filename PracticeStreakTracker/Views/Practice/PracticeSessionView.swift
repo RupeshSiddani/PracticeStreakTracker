@@ -33,7 +33,7 @@ struct PracticeSessionView: View {
                 }
             }
             .background(Color.tsGroupedBackground.ignoresSafeArea())
-            .navigationTitle("\(viewModel.currentPracticeSoundName) Sound Practice")
+            .navigationTitle("R-Sound Practice")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

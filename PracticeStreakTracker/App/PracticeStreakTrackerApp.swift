@@ -15,6 +15,7 @@ struct PracticeStreakTrackerApp: App {
                 }
             }
             .environmentObject(viewModel)
+            .preferredColorScheme(nil)
             .animation(.easeInOut(duration: 0.4), value: viewModel.isOnboardingComplete)
         }
     }

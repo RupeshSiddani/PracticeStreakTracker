@@ -154,10 +154,10 @@ struct DashboardView: View {
                     .font(.title2)
                 
                 VStack(spacing: 2) {
-                    Text(viewModel.hasPracticedToday ? "Practice Complete!" : "Start Practice")
+                    Text(viewModel.hasPracticedToday ? "Practice Complete!" : "Start R-Sound Practice")
                         .font(.headline)
                     if !viewModel.hasPracticedToday {
-                        Text("Today: \(viewModel.currentPracticeSoundName) Sound")
+                        Text("9 guided exercises • ~3 min")
                             .font(.caption)
                             .opacity(0.85)
                     }

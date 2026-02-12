@@ -1,16 +1,17 @@
 import SwiftUI
 
 // MARK: - Onboarding View
-/// Multi-step onboarding flow that collects user's name, age group,
-/// and which speech sounds they struggle with to personalize exercises.
+/// Simplified 3-step onboarding for rhotacism therapy.
+/// Collects user's name and age group, then starts R-sound practice.
 struct OnboardingView: View {
     
     @EnvironmentObject var viewModel: StreakViewModel
     @State private var currentPage = 0
     @State private var name = ""
     @State private var selectedAge: AgeGroup = .adult
-    @State private var selectedSounds: Set<SpeechSound> = [.r]
-    @State private var animateContent = false
+    @FocusState private var isNameFieldFocused: Bool
+    
+    private let totalPages = 3
     
     var body: some View {
         ZStack {
@@ -21,6 +22,7 @@ struct OnboardingView: View {
                 endPoint: .bottom
             )
             .ignoresSafeArea()
+            .onTapGesture { isNameFieldFocused = false }
             
             VStack(spacing: 0) {
                 // Progress dots
@@ -30,10 +32,8 @@ struct OnboardingView: View {
                 // Content
                 TabView(selection: $currentPage) {
                     welcomePage.tag(0)
-                    namePage.tag(1)
-                    agePage.tag(2)
-                    soundsPage.tag(3)
-                    readyPage.tag(4)
+                    detailsPage.tag(1)
+                    readyPage.tag(2)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .animation(.easeInOut(duration: 0.3), value: currentPage)
@@ -50,7 +50,7 @@ struct OnboardingView: View {
     
     private var progressDots: some View {
         HStack(spacing: 8) {
-            ForEach(0..<5) { index in
+            ForEach(0..<totalPages, id: \.self) { index in
                 Capsule()
                     .fill(index <= currentPage ? Color.tsSecondaryFallback : Color.secondary.opacity(0.2))
                     .frame(width: index == currentPage ? 24 : 8, height: 8)
@@ -70,200 +70,144 @@ struct OnboardingView: View {
                 .foregroundStyle(LinearGradient.tsPrimaryGradient)
                 .padding(.bottom, 8)
             
-            Text("Welcome to\nPractice Streak Tracker")
+            Text("Master Your\nR Sound")
                 .font(.largeTitle.weight(.bold))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.primary)
             
-            Text("Your R-sound speech therapy companion.\nDesigned to help you master the R sound\nthrough daily guided practice.")
+            Text("A daily practice companion built for\npeople with rhotacism — difficulty\npronouncing the \"R\" sound.")
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
             
-            Spacer()
+            VStack(spacing: 10) {
+                featureRow(icon: "mouth.fill", text: "Guided tongue & mouth exercises")
+                featureRow(icon: "flame.fill", text: "Daily streak tracking")
+                featureRow(icon: "trophy.fill", text: "Milestones & celebrations")
+                featureRow(icon: "bell.badge.fill", text: "Practice reminders")
+            }
+            .padding(.top, 8)
+            
             Spacer()
         }
         .padding(.horizontal, 24)
     }
     
-    // MARK: - Page 2: Name
-    
-    private var namePage: some View {
-        VStack(spacing: 24) {
-            Spacer()
-            
-            Image(systemName: "person.crop.circle.fill")
-                .font(.system(size: 64))
+    private func featureRow(icon: String, text: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.body)
                 .foregroundColor(.tsSecondaryFallback)
-            
-            Text("What's your name?")
-                .font(.title.weight(.bold))
-                .foregroundColor(.primary)
-            
-            Text("We'll use this to personalize your experience.")
+                .frame(width: 28)
+            Text(text)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-            
-            TextField("Enter your name", text: $name)
-                .font(.title3)
-                .multilineTextAlignment(.center)
-                .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.tsCardBackground)
-                        .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
-                )
-                .padding(.horizontal, 40)
-                .autocorrectionDisabled()
-            
-            Spacer()
             Spacer()
         }
         .padding(.horizontal, 24)
     }
     
-    // MARK: - Page 3: Age Group
+    // MARK: - Page 2: Name + Age
     
-    private var agePage: some View {
-        VStack(spacing: 24) {
-            Spacer()
-            
-            Image(systemName: "calendar.circle.fill")
-                .font(.system(size: 64))
-                .foregroundColor(.tsAccentFallback)
-            
-            Text("What's your age group?")
-                .font(.title.weight(.bold))
-                .foregroundColor(.primary)
-            
-            Text("This helps us adjust the difficulty\nand language of exercises.")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-            
-            VStack(spacing: 12) {
-                ForEach(AgeGroup.allCases) { age in
-                    Button {
-                        withAnimation(.spring(response: 0.3)) {
-                            selectedAge = age
-                        }
-                        HapticService.shared.selectionChanged()
-                    } label: {
-                        HStack(spacing: 14) {
-                            Text(age.emoji)
-                                .font(.title2)
-                            
-                            Text(age.displayName)
-                                .font(.headline)
-                                .foregroundColor(.primary)
-                            
-                            Spacer()
-                            
-                            if selectedAge == age {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.tsSecondaryFallback)
-                                    .font(.title3)
-                            }
-                        }
-                        .padding(16)
+    private var detailsPage: some View {
+        ScrollView {
+            VStack(spacing: 28) {
+                Spacer().frame(height: 20)
+                
+                Image(systemName: "person.crop.circle.fill")
+                    .font(.system(size: 56))
+                    .foregroundColor(.tsSecondaryFallback)
+                
+                Text("Tell us about yourself")
+                    .font(.title.weight(.bold))
+                    .foregroundColor(.primary)
+                
+                // Name input
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("YOUR NAME")
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(.secondary)
+                        .padding(.leading, 4)
+                    
+                    TextField("Enter your name", text: $name)
+                        .font(.title3)
+                        .padding()
+                        .focused($isNameFieldFocused)
+                        .textInputAutocapitalization(.words)
+                        .submitLabel(.done)
                         .background(
                             RoundedRectangle(cornerRadius: 14)
                                 .fill(Color.tsCardBackground)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 14)
                                         .strokeBorder(
-                                            selectedAge == age ? Color.tsSecondaryFallback : Color.clear,
-                                            lineWidth: 2
+                                            isNameFieldFocused ? Color.tsSecondaryFallback : Color.secondary.opacity(0.15),
+                                            lineWidth: isNameFieldFocused ? 2 : 1
                                         )
                                 )
-                                .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
                         )
+                        .autocorrectionDisabled()
+                }
+                .padding(.horizontal, 8)
+                
+                // Age group selection
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("AGE GROUP")
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(.secondary)
+                        .padding(.leading, 4)
+                    
+                    VStack(spacing: 10) {
+                        ForEach(AgeGroup.allCases) { age in
+                            Button {
+                                withAnimation(.spring(response: 0.3)) {
+                                    selectedAge = age
+                                }
+                                isNameFieldFocused = false
+                                HapticService.shared.selectionChanged()
+                            } label: {
+                                HStack(spacing: 14) {
+                                    Text(age.emoji)
+                                        .font(.title2)
+                                    
+                                    Text(age.displayName)
+                                        .font(.headline)
+                                        .foregroundColor(.primary)
+                                    
+                                    Spacer()
+                                    
+                                    if selectedAge == age {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundColor(.tsSecondaryFallback)
+                                            .font(.title3)
+                                    }
+                                }
+                                .padding(14)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 14)
+                                        .fill(Color.tsCardBackground)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 14)
+                                                .strokeBorder(
+                                                    selectedAge == age ? Color.tsSecondaryFallback : Color.secondary.opacity(0.15),
+                                                    lineWidth: selectedAge == age ? 2 : 1
+                                                )
+                                        )
+                                )
+                            }
+                        }
                     }
                 }
+                .padding(.horizontal, 8)
+                
+                Spacer().frame(height: 20)
             }
             .padding(.horizontal, 16)
-            
-            Spacer()
-            Spacer()
-        }
-        .padding(.horizontal, 24)
-    }
-    
-    // MARK: - Page 4: Sound Selection
-    
-    private var soundsPage: some View {
-        VStack(spacing: 20) {
-            Spacer()
-            
-            Image(systemName: "mouth.fill")
-                .font(.system(size: 56))
-                .foregroundColor(.celebrationPurple)
-            
-            Text("Which sounds are\ndifficult for you?")
-                .font(.title.weight(.bold))
-                .foregroundColor(.primary)
-                .multilineTextAlignment(.center)
-            
-            Text("R is pre-selected as your primary focus.\nSelect any additional sounds you'd like to practice.")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-            
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                ForEach(SpeechSound.allCases) { sound in
-                    soundCard(sound)
-                }
-            }
-            .padding(.horizontal, 8)
-            
-            Spacer()
-        }
-        .padding(.horizontal, 24)
-    }
-    
-    private func soundCard(_ sound: SpeechSound) -> some View {
-        let isSelected = selectedSounds.contains(sound)
-        
-        return Button {
-            withAnimation(.spring(response: 0.3)) {
-                if isSelected {
-                    selectedSounds.remove(sound)
-                } else {
-                    selectedSounds.insert(sound)
-                }
-            }
-            HapticService.shared.selectionChanged()
-        } label: {
-            VStack(spacing: 8) {
-                Image(systemName: sound.icon)
-                    .font(.title)
-                    .foregroundColor(isSelected ? .white : .tsSecondaryFallback)
-                
-                Text(sound.displayName)
-                    .font(.headline)
-                    .foregroundColor(isSelected ? .white : .primary)
-                
-                Text(sound == .r ? "Rhotacism" : sound == .s ? "Lisping" : sound == .l ? "Lambdacism" : sound == .th ? "TH fronting" : sound == .sh ? "Palatalization" : "Backing")
-                    .font(.caption2)
-                    .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .background(
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(isSelected ? Color.tsSecondaryFallback : Color.tsCardBackground)
-                    .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 14)
-                    .strokeBorder(isSelected ? Color.clear : Color.secondary.opacity(0.1), lineWidth: 1)
-            )
         }
     }
     
-    // MARK: - Page 5: Ready
+    // MARK: - Page 3: Ready
     
     private var readyPage: some View {
         VStack(spacing: 24) {
@@ -273,37 +217,54 @@ struct OnboardingView: View {
                 .font(.system(size: 72))
                 .foregroundStyle(LinearGradient.celebrationGradient)
             
-            Text("You're all set,\n\(name.isEmpty ? "friend" : name)!")
+            Text("Let's go,\n\(name.trimmingCharacters(in: .whitespaces).isEmpty ? "friend" : name.trimmingCharacters(in: .whitespaces))!")
                 .font(.largeTitle.weight(.bold))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.primary)
             
-            VStack(spacing: 8) {
-                Text("Here's your plan:")
+            VStack(spacing: 12) {
+                Text("Your R-Sound Practice Plan")
                     .font(.headline)
                     .foregroundColor(.primary)
                 
-                if selectedSounds.isEmpty {
-                    Text("General speech practice exercises")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                } else {
-                    Text("Custom exercises for: \(selectedSounds.map { $0.displayName }.joined(separator: ", "))")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
+                VStack(spacing: 6) {
+                    planRow(icon: "1.circle.fill", text: "Warm up your jaw & tongue")
+                    planRow(icon: "2.circle.fill", text: "Practice R sound isolation")
+                    planRow(icon: "3.circle.fill", text: "R in words & tongue twisters")
+                    planRow(icon: "4.circle.fill", text: "R in full sentences")
+                    planRow(icon: "5.circle.fill", text: "Fun challenges & cool down")
                 }
                 
-                Text("Daily practice • Streak tracking • Milestones")
+                Text("~3 minutes per session • Daily practice")
                     .font(.caption)
                     .foregroundColor(.tsSecondaryFallback)
-                    .padding(.top, 4)
+                    .padding(.top, 6)
             }
+            .padding(20)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.tsCardBackground)
+                    .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 3)
+            )
+            .padding(.horizontal, 8)
             
             Spacer()
             Spacer()
         }
         .padding(.horizontal, 24)
+    }
+    
+    private func planRow(icon: String, text: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.subheadline)
+                .foregroundColor(.tsSecondaryFallback)
+                .frame(width: 24)
+            Text(text)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            Spacer()
+        }
     }
     
     // MARK: - Navigation Buttons
@@ -313,6 +274,7 @@ struct OnboardingView: View {
             // Back button (hidden on first page)
             if currentPage > 0 {
                 Button {
+                    isNameFieldFocused = false
                     withAnimation { currentPage -= 1 }
                 } label: {
                     Text("Back")
@@ -330,14 +292,15 @@ struct OnboardingView: View {
             
             // Next / Get Started button
             Button {
-                if currentPage == 4 {
+                isNameFieldFocused = false
+                if currentPage == totalPages - 1 {
                     completeOnboarding()
                 } else {
                     withAnimation { currentPage += 1 }
                 }
                 HapticService.shared.mediumImpact()
             } label: {
-                Text(currentPage == 4 ? "Get Started!" : "Continue")
+                Text(currentPage == totalPages - 1 ? "Start Practicing!" : "Continue")
                     .font(.headline)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
@@ -354,7 +317,6 @@ struct OnboardingView: View {
     private var isNextEnabled: Bool {
         switch currentPage {
         case 1: return !name.trimmingCharacters(in: .whitespaces).isEmpty
-        case 3: return !selectedSounds.isEmpty
         default: return true
         }
     }
@@ -365,7 +327,7 @@ struct OnboardingView: View {
         let profile = UserProfile(
             name: name.trimmingCharacters(in: .whitespaces),
             ageGroup: selectedAge,
-            selectedSounds: Array(selectedSounds),
+            selectedSounds: [.r],
             onboardingCompleted: true
         )
         viewModel.completeOnboarding(profile: profile)
